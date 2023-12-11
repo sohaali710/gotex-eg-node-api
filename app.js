@@ -7,6 +7,7 @@ const multer = require('multer')
 const cors = require('cors');
 let morgan = require('morgan')
 app.use(morgan('combined'))
+app.set("view engine", "ejs");
 
 const { dbConnection } = require('./db/mongoose');
 const { upload, uploadClintReceipts } = require('./middleware/fileUpload')
