@@ -2,23 +2,32 @@ const mongoose = require("mongoose");
 
 const orderSchema = mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    company: String,
     ordernumber: String,
     paytype: String,
     price: Number,
     codPrice: Number,
-    marktercode: String,
     created_at: Date,
-    inovicedaftra: Object,
+
+    p_name: String,
+    p_email: String,
+    p_city: String,
+    p_address: String,
+    p_mobile: Number,
+
+    c_name: String,
+    c_email: String,
+    c_city: String,
+    c_address: String,
+    c_mobile: Number,
+
+    weight: Number,
+    quantity: Number,
+    description: String,
     status: {
         type: String,
         enum: ['failed', 'pending', 'accepted', 'canceled'],
         default: 'pending'
     }
-
-    p_name, p_city, p_mobile, p_streetaddress,
-    c_name, c_city, c_mobile, c_streetaddress,
-    weight, quantity, cod, description
 })
 
 module.exports = mongoose.model("Order", orderSchema);

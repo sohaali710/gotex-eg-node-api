@@ -16,6 +16,8 @@ const PORT = process.env.PORT
 const adminRoute = require('./routes/admin')
 const userRoute = require('./routes/user')
 const citiesRoute = require('./routes/cities')
+const companyRoute = require('./routes/company')
+const ordersRoute = require('./routes/orders/orders')
 
 // Middlewares
 app.use(express.static('public'))
@@ -31,12 +33,14 @@ dbConnection()
 
 // File Upload
 app.post('/user/signup', upload.array('cr'));
-// app.post('/invitation/invited-user-signup', upload.array('cr'));
+app.post('/user/check-tap-payment/fawry', uploadClintReceipts.single('receipt'));
 
 // Routes
 app.use('/admin', adminRoute);
 app.use('/user', userRoute);
 app.use('/cities', citiesRoute);
+app.use('/company', companyRoute);
+app.use('/orders', ordersRoute);
 
 app.all("*", (req, res, next) => {
     res.status(400).json({ msg: `Can't ${req.method} with this route: ${req.originalUrl}` })
