@@ -163,8 +163,8 @@ exports.checkPayment = async (req, res) => {
     }
 }
 exports.checkFawryPayment = async (req, res) => {
-    const { userId, paymentOrderId } = req.body
-
+    const { paymentOrderId } = req.body
+    const userId = req.user.user.id;
     try {
         const order = await PaymentOrder.findById(paymentOrderId);
         const user = await User.findById(userId);

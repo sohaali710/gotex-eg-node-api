@@ -22,7 +22,7 @@ routes.get("/get-all-payment-orders", isAuth, getAllPaymentOrders);
 /** user payment [with tap gateway] */
 routes.post("/user-charge", isAuth, userCharge);
 routes.get("/check-tap-payment/:userId/:code", checkPayment);
-routes.post("/check-tap-payment/fawry", checkFawryPayment);
+routes.post("/check-tap-payment/fawry", isAuth, checkFawryPayment);
 routes.get("/get-user-payment-orders", isAuth, getUserPaymentOrders);
 
 routes.get("/get-test-api-key", isAuth, generateApiKeyForTest);
