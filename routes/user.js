@@ -20,10 +20,10 @@ routes.get("/checkpayment/:status/:uId/:code", checkPaymentOrder);
 routes.get("/get-all-payment-orders", isAuth, getAllPaymentOrders);
 
 /** user payment [with tap gateway] */
-routes.post("/user-charge", isAuth, userCharge);
+routes.post("/user-charge", isValidApi, userCharge);
 routes.get("/check-tap-payment/:userId/:code", checkPayment);
-routes.post("/check-tap-payment/fawry", checkFawryPayment);
-routes.get("/get-user-payment-orders", isAuth, getUserPaymentOrders);
+routes.post("/check-tap-payment/fawry", isValidApi, checkFawryPayment);
+routes.get("/get-user-payment-orders", isValidApi, getUserPaymentOrders);
 
 routes.get("/get-test-api-key", isAuth, generateApiKeyForTest);
 routes.get("/get-production-api-key", isAuth, generateApiKeyForProduction);
