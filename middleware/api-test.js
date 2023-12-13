@@ -7,12 +7,12 @@ exports.isValid = async (req, res, next) => {
     try {
         if (!user) {
             return res.status(400).json({
-                err: "userId not valied"
+                err: "userId not valid"
             })
         }
         if (user.apikey.test != key) {
             return res.status(400).json({
-                err: "apiKey not valied"
+                err: "apiKey not valid"
             })
         }
         next();
