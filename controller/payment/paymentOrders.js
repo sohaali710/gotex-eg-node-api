@@ -109,12 +109,10 @@ exports.checkPayment = async (req, res) => {
         const order = await PaymentOrder.findOne({ code });
         const user = await User.findById(userId);
 
-        const charge = await getCharge(order.data.id)
-        const currentStatus = charge.data.status
 
         if (!order) {
             return res.render("payment-result", {
-                text1: `Your charge status is Failed`,
+                text1: `Failed, this payment order is not found`,
                 text2: `Your wallet is = `,
                 balance: user.wallet
             })
@@ -122,6 +120,9 @@ exports.checkPayment = async (req, res) => {
                 data: "failed"
             })
         }
+
+        const charge = await getCharge(order.data.id)
+        const currentStatus = charge.data.status
 
         if (currentStatus != "CAPTURED") {
             return res.render("payment-result", {
@@ -168,8 +169,6 @@ exports.checkFawryPayment = async (req, res) => {
         const order = await PaymentOrder.findById(paymentOrderId);
         const user = await User.findById(userId);
 
-        const charge = await getCharge(order.data.id)
-        const currentStatus = charge.data.status
 
         if (!user) {
             res.status(400).json({
@@ -178,7 +177,7 @@ exports.checkFawryPayment = async (req, res) => {
         }
         if (!order) {
             return res.render("payment-result", {
-                text1: `Your charge status is Failed`,
+                text1: `Failed, this payment order is not found`,
                 text2: `Your wallet is = `,
                 balance: user.wallet
             })
@@ -186,6 +185,9 @@ exports.checkFawryPayment = async (req, res) => {
                 data: "failed"
             })
         }
+
+        const charge = await getCharge(order.data.id)
+        const currentStatus = charge.data.status
 
         if (currentStatus != "CAPTURED") {
             return res.render("payment-result", {
