@@ -171,6 +171,11 @@ exports.checkFawryPayment = async (req, res) => {
         const charge = await getCharge(order.data.id)
         const currentStatus = charge.data.status
 
+        if (!user) {
+            res.status(400).json({
+                data: `No user for this id ${userId}`
+            })
+        }
         if (!order) {
             return res.render("payment-result", {
                 text1: `Your charge status is Failed`,
