@@ -73,7 +73,7 @@ exports.userCharge = async (req, res) => {
             status: "pending"
         })
 
-        res.status(200).json({ data: response.data })
+        res.status(200).json({ data: paymentOrder })
     } catch (err) {
         console.log(err)
         res.status(500).json({
