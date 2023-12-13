@@ -7,9 +7,9 @@ const balanceAlertMailSubject = "Alert! Your wallet balance is less than 100 SAR
 
 exports.createOrder = async (req, res) => {
     const {
-        p_name, p_email, p_city, p_address, p_mobile,
-        c_name, c_email, c_city, c_address, c_mobile,
-        weight, quantity, description, cod, userId } = req.body
+        p_name, p_email = '', p_city, p_address, p_mobile,
+        c_name, c_email = '', c_city, c_address, c_mobile,
+        weight, quantity, description = '', cod, userId } = req.body
 
     const totalShipPrice = res.locals.totalShipPrice;
     const cashondelivery = res.locals.codAmount;
@@ -66,7 +66,7 @@ exports.createOrder = async (req, res) => {
 
 exports.getUserOrders = async (req, res) => {
     const userId = req.body.userId;
-    Order.find({ user: userId, status: { $ne: "failed" } })
+    Order.find({ user: userId })
         .then(o => {
             res.status(200).json({
                 data: o

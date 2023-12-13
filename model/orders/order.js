@@ -12,13 +12,13 @@ const orderSchema = mongoose.Schema({
     p_email: String,
     p_city: String,
     p_address: String,
-    p_mobile: Number,
+    p_mobile: String,
 
     c_name: String,
     c_email: String,
     c_city: String,
     c_address: String,
-    c_mobile: Number,
+    c_mobile: String,
 
     weight: Number,
     quantity: Number,
