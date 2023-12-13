@@ -4,7 +4,8 @@ const axios = require("axios");
 const genRandomString = require("../../modules/genRandomString");
 
 exports.userCharge = async (req, res) => {
-    const { userId, amount, countryCode, mobileNumWithoutCode } = req.body;
+    const { amount, countryCode, mobileNumWithoutCode } = req.body;
+    const userId = req.user.user.id;
 
     try {
         const user = await User.findById(userId)
@@ -231,7 +232,7 @@ exports.checkFawryPayment = async (req, res) => {
 }
 
 exports.getUserPaymentOrders = async (req, res) => {
-    const userId = req.body.userId;
+    const userId = req.user.user.id;
     const orders = await PaymentOrder.find({ user: userId });
     try {
         res.status(200).json({
