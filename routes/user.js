@@ -3,7 +3,7 @@ const routes = express.Router();
 const { signUp, marketerSignUp, logIn, activateUser, reSendActivateCode, forgetPasswordEmail, setNewPassword, getUserBalance, addBalance, checkPaymentOrder, getAllPaymentOrders, generateApiKeyForTest, generateApiKeyForProduction, getUserData } = require("../controller/user");
 const { isValid, isAuth } = require('../middleware/user');
 const { isValid: isValidApi } = require("../middleware/api-test");
-const { userCharge, checkPayment, getUserPaymentOrders } = require("../controller/payment/main");
+const { userCharge, checkPayment, getUserPaymentOrders, checkFawryPayment } = require("../controller/payment/paymentOrders");
 
 routes.post('/signup', isValid, signUp);
 routes.post('/login', logIn);
@@ -22,6 +22,7 @@ routes.get("/get-all-payment-orders", isAuth, getAllPaymentOrders);
 /** user payment [with tap gateway] */
 routes.post("/user-charge", isAuth, userCharge);
 routes.get("/check-tap-payment/:userId/:code", checkPayment);
+routes.post("/check-tap-payment/fawry", checkFawryPayment);
 routes.get("/get-user-payment-orders", isAuth, getUserPaymentOrders);
 
 routes.get("/get-test-api-key", isAuth, generateApiKeyForTest);

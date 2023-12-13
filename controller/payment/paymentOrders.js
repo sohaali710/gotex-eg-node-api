@@ -1,10 +1,10 @@
 const User = require("../../model/user");
-const PaymentOrder = require("../../model/payment/orders");
+const PaymentOrder = require("../../model/payment/paymentOrders");
 const axios = require("axios");
 const genRandomString = require("../../modules/genRandomString");
 
 exports.userCharge = async (req, res) => {
-    const amount = req.body.amount;
+    const { amount, countryCode, mobileNumWithoutCode } = req.body;
     const userId = req.user.user.id;
 
     try {
@@ -13,7 +13,7 @@ exports.userCharge = async (req, res) => {
 
         let data = JSON.stringify({
             "amount": amount,
-            "currency": "SAR",
+            "currency": "EGP",
             "threeDSecure": true,
             "save_card": false,
             "customer_initiated": true,
@@ -36,8 +36,8 @@ exports.userCharge = async (req, res) => {
                 "last_name": "",
                 "email": user.email,
                 "phone": {
-                    "country_code": "966",
-                    "number": user.mobile
+                    "country_code": countryCode,
+                    "number": mobileNumWithoutCode
                 }
             },
             "merchant": {
@@ -81,6 +81,7 @@ exports.userCharge = async (req, res) => {
         })
     }
 }
+
 const getCharge = (chargeId) => {
     try {
         const config = {
@@ -101,11 +102,9 @@ const getCharge = (chargeId) => {
         })
     }
 }
-
 exports.checkPayment = async (req, res) => {
-    const userId = req.params.userId;
-    const code = req.params.code;
-    const status = req.params.status;
+    const { userId, code } = req.params
+
     try {
         const order = await PaymentOrder.findOne({ code });
         const user = await User.findById(userId);
@@ -115,7 +114,8 @@ exports.checkPayment = async (req, res) => {
 
         if (!order) {
             return res.render("payment-result", {
-                myText: "Failed, your wallet is =",
+                text1: `Your charge status is Failed`,
+                text2: `Your wallet is = `,
                 balance: user.wallet
             })
             res.status(400).json({
@@ -125,7 +125,8 @@ exports.checkPayment = async (req, res) => {
 
         if (currentStatus != "CAPTURED") {
             return res.render("payment-result", {
-                myText: `${currentStatus}, your wallet is =`,
+                text1: `Your charge status is ${currentStatus}`,
+                text2: `Your wallet is = `,
                 balance: user.wallet
             })
             return res.status(400).json({
@@ -134,13 +135,77 @@ exports.checkPayment = async (req, res) => {
         } else {
             user.wallet = user.wallet + order.amount
             await user.save()
+
+            order.code = genRandomString(10);
         }
 
         order.status = currentStatus;
-        order.code = genRandomString(10);
         await order.save()
         return res.render("payment-result", {
-            myText: `${currentStatus}, your wallet is =`,
+            text1: `Your charge status is ${currentStatus}`,
+            text2: `Your wallet is = `,
+            balance: user.wallet
+        })
+
+        const data = {
+            amount: order.amount,
+            userBalance: user.wallet
+        }
+        res.status(200).json({
+            data: data
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: err.message
+        })
+    }
+}
+exports.checkFawryPayment = async (req, res) => {
+    const { userId, paymentOrderId } = req.body
+
+    try {
+        const order = await PaymentOrder.findById(paymentOrderId);
+        const user = await User.findById(userId);
+
+        const charge = await getCharge(order.data.id)
+        const currentStatus = charge.data.status
+
+        if (!order) {
+            return res.render("payment-result", {
+                text1: `Your charge status is Failed`,
+                text2: `Your wallet is = `,
+                balance: user.wallet
+            })
+            res.status(400).json({
+                data: "failed"
+            })
+        }
+
+        if (currentStatus != "CAPTURED") {
+            return res.render("payment-result", {
+                text1: `Your charge status is ${currentStatus}`,
+                text2: `Your wallet is = `,
+                balance: user.wallet
+            })
+            return res.status(400).json({
+                data: status
+            })
+        } else {
+            user.wallet = user.wallet + order.amount
+            await user.save()
+
+            order.code = genRandomString(10);
+        }
+
+        if (req.file) {
+            order.receipts.push(req.file.path)
+        }
+        order.status = currentStatus;
+        await order.save()
+        return res.render("payment-result", {
+            text1: `Your charge status is ${currentStatus}`,
+            text2: `Your wallet is = `,
             balance: user.wallet
         })
 
