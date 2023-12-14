@@ -1,22 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../model/user");
-// const AnwanOrders = require("../model/orders/anwanOrders");
-// const AramexOrders = require("../model/orders/aramexOrders");
-// const GltOrders = require("../model/orders/gltOrders");
-// const ImileOrders = require("../model/orders/imileOrders");
-// const JtOrders = require("../model/orders/jtOrders");
-// const SaeeOrders = require("../model/orders/saeeOrders");
-// const SmsaOrders = require("../model/orders/smsaOrders");
-// const SplOrders = require("../model/orders/splOrders");
-// const Anwan = require("../model/companies/anwan");
-// const Aramex = require("../model/companies/aramex");
-// const Glt = require("../model/companies/glt");
-// const Imile = require("../model/companies/imile");
-// const Jt = require("../model/companies/jt");
-// const Saee = require("../model/companies/saee");
-// const Smsa = require("../model/companies/smsa");
-// const Spl = require("../model/companies/spl");
-
+const Order = require("../model/orders/order");
+const paginate = require("../modules/paginate");
 
 exports.logIn = (req, res) => {
     const { email, password } = req.body
@@ -48,9 +33,7 @@ exports.logIn = (req, res) => {
     }
 }
 
-/**
- * @Desc : User CRUD
- */
+/** User CRUD */
 exports.getAllUsers = async (req, res) => {
     try {
         const users = await User.find()
@@ -125,52 +108,50 @@ exports.unProofCrForUser = async (req, res) => {
         })
     }
 }
-// /**
-//  * @Desc : Companies CRUD
-//  */
-// exports.getAllCompanies = async (req, res) => {
-//     try {
-//         const anwan = await Anwan.findOne();
-//         const aramex = await Aramex.findOne();
-//         const glt = await Glt.findOne();
-//         const imile = await Imile.findOne();
-//         const jt = await Jt.findOne();
-//         const saee = await Saee.findOne();
-//         const smsa = await Smsa.findOne();
-//         const spl = await Spl.findOne();
 
-//         let companies = [aramex, anwan, glt, imile, jt, saee, smsa, spl];
-//         res.status(200).json({ data: { companies } })
-//     } catch (err) {
-//         console.log(err)
-//         res.status(500).json({
-//             msg: "server error",
-//             error: err.message
-//         })
-//     }
-// }
-// /**
-//  * @Desc : Orders CRUD
-//  */
-// exports.getAllOrders = async (req, res) => {
-//     try {
-//         const anwanOrders = await AnwanOrders.find({ status: { $ne: "failed" } }).populate("user");
-//         const aramexOrders = await AramexOrders.find({ status: { $ne: "failed" } }).populate("user");
-//         const gltOrders = await GltOrders.find({ status: { $ne: "failed" } }).populate("user");
-//         const imileOrders = await ImileOrders.find({ status: { $ne: "failed" } }).populate("user");
-//         const jtOrders = await JtOrders.find({ status: { $ne: "failed" } }).populate("user");
-//         const saeeOrders = await SaeeOrders.find({ status: { $ne: "failed" } }).populate("user");
-//         const smsaOrders = await SmsaOrders.find({ status: { $ne: "failed" } }).populate("user");
-//         const splOrders = await SplOrders.find({ status: { $ne: "failed" } }).populate("user");
 
-//         let orders = [...anwanOrders, ...aramexOrders, ...gltOrders, ...imileOrders, ...jtOrders, ...saeeOrders, ...smsaOrders, ...splOrders];
-//         res.status(200).json({ data: { orders } })
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).json({
-//             msg: "server error",
-//             error: err.message
-//         })
-//     }
+/** Orders CRUD */
+/**
+ * @Desc :  Filter with paytype or keyword (user data -> name, email or mobile)
+ *        + Filter by date
+ *        + Pagination
+ */
+exports.getAllOrders = async (req, res) => {
+    /** Pagination -> default: page=1, limit=30 (max number of items (orders) per page)*/
+    let page = +req.query.page || 1
+    const limit = +req.query.limit || 30
+    const startDate = req.query.startDate || new Date('2000-01-01')
+    const endDate = req.query.endDate || new Date()
+    const { paytype = '', keyword = '' } = req.query
 
-// }
+    try {
+        let orders = await Order.find({
+            paytype: { $regex: paytype, $options: 'i' },// $options: 'i' to make it case-insensitive (accept capital or small chars)
+            created_at: {
+                $gte: startDate,
+                $lte: endDate
+            }
+        }).populate({
+            path: 'user', /**@Desc if users.name or user.email != keyword, it returns user=null */
+            match: {
+                $or: [
+                    { name: { $regex: keyword, $options: 'i' } },
+                    { email: { $regex: keyword, $options: 'i' } },
+                    { mobile: { $regex: keyword, $options: 'i' } }
+                ]
+            }
+        });
+
+        if (keyword) {
+            orders = orders.filter(order => order.user) // filter orders to remove user=null
+        }
+
+        const ordersPagination = paginate(orders, page, limit)
+        res.status(200).json({ ...ordersPagination })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: err.message
+        })
+    }
+}
