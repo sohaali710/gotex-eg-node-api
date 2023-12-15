@@ -15,6 +15,7 @@ const PORT = process.env.PORT
 
 const adminRoute = require('./routes/admin')
 const userRoute = require('./routes/user')
+const marketersRoute = require('./routes/marketer')
 const citiesRoute = require('./routes/cities')
 const companyRoute = require('./routes/company')
 const ordersRoute = require('./routes/orders/orders')
@@ -38,6 +39,7 @@ app.post('/user/check-tap-payment/fawry', uploadClintReceipts.single('receipt'))
 // Routes
 app.use('/admin', adminRoute);
 app.use('/user', userRoute);
+app.use('/marketer', marketersRoute);
 app.use('/cities', citiesRoute);
 app.use('/company', companyRoute);
 app.use('/orders', ordersRoute);
