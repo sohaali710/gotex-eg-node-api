@@ -1,7 +1,5 @@
 const jwt = require("jsonwebtoken");
 const User = require("../model/user");
-const Order = require("../model/orders/order");
-const paginate = require("../modules/paginate");
 
 exports.logIn = (req, res) => {
     const { email, password } = req.body
@@ -104,53 +102,6 @@ exports.unProofCrForUser = async (req, res) => {
         console.log(err)
         res.status(500).json({
             msg: "server error",
-            error: err.message
-        })
-    }
-}
-
-
-/** Orders CRUD */
-/**
- * @Desc :  Filter with paytype or keyword (user data -> name, email or mobile)
- *        + Filter by date
- *        + Pagination
- */
-exports.getAllOrders = async (req, res) => {
-    /** Pagination -> default: page=1, limit=30 (max number of items (orders) per page)*/
-    let page = +req.query.page || 1
-    const limit = +req.query.limit || 30
-    const startDate = req.query.startDate || new Date('2000-01-01')
-    const endDate = req.query.endDate || new Date()
-    const { paytype = '', keyword = '' } = req.query
-
-    try {
-        let orders = await Order.find({
-            paytype: { $regex: paytype, $options: 'i' },// $options: 'i' to make it case-insensitive (accept capital or small chars)
-            created_at: {
-                $gte: startDate,
-                $lte: endDate
-            }
-        }).populate({
-            path: 'user', /**@Desc if users.name or user.email != keyword, it returns user=null */
-            match: {
-                $or: [
-                    { name: { $regex: keyword, $options: 'i' } },
-                    { email: { $regex: keyword, $options: 'i' } },
-                    { mobile: { $regex: keyword, $options: 'i' } }
-                ]
-            }
-        });
-
-        if (keyword) {
-            orders = orders.filter(order => order.user) // filter orders to remove user=null
-        }
-
-        const ordersPagination = paginate(orders, page, limit)
-        res.status(200).json({ ...ordersPagination })
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({
             error: err.message
         })
     }
