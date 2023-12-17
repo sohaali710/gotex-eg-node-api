@@ -2,7 +2,6 @@ const User = require("../../model/user");
 const PaymentOrder = require("../../model/payment/paymentOrders");
 const axios = require("axios");
 const genRandomString = require("../../modules/genRandomString");
-const { DateTime } = require('luxon');
 
 exports.userCharge = async (req, res) => {
     const { amount, countryCode, mobileNumWithoutCode } = req.body;
