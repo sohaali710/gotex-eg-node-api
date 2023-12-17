@@ -5,9 +5,9 @@ const jwt = require("jsonwebtoken");
 const Order = require("../model/orders/order");
 const paginate = require("../modules/paginate");
 
-exports.MarketerSignUp = async (req, res) => {
+exports.createMarketerAccount = async (req, res) => {
     try {
-        let { name, email, password, mobile, code } = req.body;
+        let { name, email, password, mobile, code = '' } = req.body;
 
         const isEmailUsed = await Marketer.findOne({ "email": email });
         if (isEmailUsed) {
@@ -38,6 +38,19 @@ exports.MarketerSignUp = async (req, res) => {
         })
     }
 }
+exports.getAllMarketers = async (req, res) => {
+    try {
+        const marketers = await Marketer.find()
+
+        res.status(200).json({ result: marketers.length, data: marketers })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            error: error.message
+        })
+    }
+}
+
 exports.logIn = async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
@@ -72,39 +85,6 @@ exports.logIn = async (req, res) => {
         console.log(error)
         res.status(500).json({
             error: error.message
-        })
-    }
-}
-
-exports.getAllMarketers = async (req, res) => {
-    try {
-        const marketers = await Marketer.find()
-
-        res.status(200).json({ result: marketers.length, data: marketers })
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            error: error.message
-        })
-    }
-}
-
-/** @NOTE : this route gives orders that is confirmed by the marketer */
-exports.getOrdersByMarketerCode = async (req, res) => {
-    /** Pagination -> default: page=1, limit=30 (max number of items (orders) per page)*/
-    let page = +req.query.page || 1
-    const limit = +req.query.limit || 30
-    const code = req.user.user.code;
-
-    try {
-        let orders = await Order.find({ "marketerCode": code }).populate('user');
-        const ordersPagination = paginate(orders, page, limit)
-
-        res.status(200).json({ ...ordersPagination })
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({
-            error: err.message
         })
     }
 }

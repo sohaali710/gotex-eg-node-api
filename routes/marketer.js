@@ -1,11 +1,11 @@
 const express = require("express");
 const routes = express.Router();
-const { MarketerSignUp, logIn, getAllMarketers, getOrdersByMarketerCode } = require("../controller/marketer");
 const { isAdminAuth } = require("../middleware/admin");
-const { isValid, isMarketer } = require("../middleware/marketer");
-routes.post("/signup", isValid, MarketerSignUp);
-routes.post("/login", logIn);
+const { logIn, getAllMarketers, createMarketerAccount } = require("../controller/marketer");
+
+routes.post("/create-marketer-account", isAdminAuth, createMarketerAccount);
 routes.get("/get-all-marketer", isAdminAuth, getAllMarketers);
-routes.get("/all-orders-by-marketer", isMarketer, getOrdersByMarketerCode)
+
+routes.post("/login", logIn);
 
 module.exports = routes
