@@ -25,9 +25,11 @@ const orderSchema = mongoose.Schema({
     description: String,
     status: {
         type: String,
-        enum: ['failed', 'pending', 'accepted', 'canceled'],
+        enum: ['failed', 'pending', 'confirmed', 'canceled'],
         default: 'pending'
-    }
+    },
+    bill: String,
+    marketerCode: String
 })
 
 module.exports = mongoose.model("Order", orderSchema);

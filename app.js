@@ -10,7 +10,7 @@ app.use(morgan('combined'))
 app.set("view engine", "ejs");
 
 const { dbConnection } = require('./db/mongoose');
-const { upload, uploadClintReceipts } = require('./middleware/fileUpload')
+const { upload, uploadClintReceipts, uploadBill } = require('./middleware/fileUpload')
 const PORT = process.env.PORT
 
 const adminRoute = require('./routes/admin')
@@ -35,6 +35,7 @@ dbConnection()
 // File Upload
 app.post('/user/signup', upload.array('cr'));
 app.post('/user/check-tap-payment/fawry', uploadClintReceipts.single('receipt'));
+app.post('/orders/confirm-order', uploadBill.single('billFile'));
 
 // Routes
 app.use('/admin', adminRoute);
