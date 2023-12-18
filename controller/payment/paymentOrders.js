@@ -170,7 +170,6 @@ exports.checkFawryPayment = async (req, res) => {
         const order = await PaymentOrder.findById(paymentOrderId);
         const user = await User.findById(userId);
 
-
         if (!user) {
             res.status(400).json({
                 data: `No user for this id ${userId}`
@@ -189,6 +188,7 @@ exports.checkFawryPayment = async (req, res) => {
 
         const charge = await getCharge(order.data.id)
         const currentStatus = charge.data.status
+        const orderCode = charge.data.redirect.url.split(userId + '/')[1]
 
         if (currentStatus != "CAPTURED") {
             return res.render("payment-result", {
@@ -199,7 +199,7 @@ exports.checkFawryPayment = async (req, res) => {
             return res.status(400).json({
                 data: status
             })
-        } else {
+        } else if (currentStatus == "CAPTURED" && order.code == orderCode) {
             user.wallet = user.wallet + order.amount
             await user.save()
 
