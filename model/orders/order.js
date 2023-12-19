@@ -29,7 +29,10 @@ const orderSchema = mongoose.Schema({
         default: 'pending'
     },
     bill: String,
-    marketerCode: String
+    marketerCode: {
+        type: String,
+        default: ''
+    }
 })
 
 module.exports = mongoose.model("Order", orderSchema);
