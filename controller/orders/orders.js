@@ -92,6 +92,7 @@ exports.getAllOrders = async (req, res) => {
     const { paytype = '', marketerCode = '', keyword = '' } = req.query
 
     try {
+        let myOrders = await Order.find({})
         let orders = await Order.find({
             paytype: { $regex: paytype, $options: 'i' },// $options: 'i' to make it case-insensitive (accept capital or small chars)
             marketerCode: { $regex: marketerCode, $options: 'i' },
@@ -110,6 +111,12 @@ exports.getAllOrders = async (req, res) => {
             },
             select: "-password -emailcode -verified -apikey -apistatus -__v"
         });
+
+        myOrders.forEach(async (order) => {
+            console.log(order.marketerCode)
+            if (!order.marketerCode) order.marketerCode = '';
+            await order.save()
+        })
 
         if (keyword) {
             orders = orders.filter(order => order.user) // filter orders to remove user=null
