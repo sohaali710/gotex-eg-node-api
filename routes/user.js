@@ -28,6 +28,6 @@ routes.get("/get-user-payment-orders", isAuth, getUserPaymentOrders);
 routes.get("/get-test-api-key", isAuth, generateApiKeyForTest);
 routes.get("/get-production-api-key", isAuth, generateApiKeyForProduction);
 
-routes.get('/get-user-data', isValidApi, getUserData);
+routes.post('/get-user-data', isValidApi, getUserData);
 
 module.exports = routes;
